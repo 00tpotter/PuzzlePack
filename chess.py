@@ -31,7 +31,7 @@ wKing = Piece('w', 'k', 'chessImages/whiteKing.png')
 
 def onBoard(position):
     if position[0] > -1 and position[1] > -1 and position[0] < 8 and position[1] < 8:
-        return true
+        return True
 
 def toString(board):
     for i in board:
