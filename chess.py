@@ -33,6 +33,7 @@ class Piece:
     moved = False
     def __init__(self, type):
         self.type = type
+        
         if type > 6:
             self.type = type - 7
             self.side = 1 
