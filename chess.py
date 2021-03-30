@@ -368,7 +368,7 @@ def findNode(pos):
 
 def main(WIN, WIDTH):
     B = Board()
-    B.positionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNbQKbNR")
+    B.positionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
     B.printBoard()
     pygame.init()
     moveNum = 0
@@ -433,9 +433,6 @@ def main(WIN, WIDTH):
             update_display(WIN, B)
 
     
-
-main(WIN, WIDTH)
 class Chess:
-    def printClass(self):
-        print("this is the chess class")
+    main(WIN, WIDTH)
 
