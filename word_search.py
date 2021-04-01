@@ -144,9 +144,9 @@ class WordSearch:
         for x in range(0, len(tempFor)):
             tempBack += tempFor[len(tempFor)-x-1]
 
-        if tempFor in self.used_words:
+        if tempFor in self.usedWords:
             return tempFor
-        elif tempBack in self.used_words:
+        elif tempBack in self.usedWords:
             return tempBack
         else:
             return ""
@@ -269,7 +269,7 @@ class WordSearch:
                         #score_file = open("high_score.txt", "r")
                         #score = score_file.read().splitlines()   # read in the best time/high score
                         #score_file.close()
-                        self.used_words = []
+                        self.usedWords = []
                         a = self.generateGame()
                         board = copy.deepcopy(a)
                         frames = 0
