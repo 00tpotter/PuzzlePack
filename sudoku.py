@@ -2,6 +2,7 @@
 import random
 import numpy as np
 import pygame
+import copy
 import sys
 
 # Needs to fill the board up following Sudoku rules
@@ -9,80 +10,109 @@ import sys
 #   Do this using a fact backtracking algorithm
 #   If there is now more than one solution, don't remove this number, try another
 
-
-
 class Sudoku:
     def __init__(self):
         self.size = 36
-        self.numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9] 
+        self.numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.solutions = 0
 
     def printClass(self):
         print("This is the sudoku class.")
 
-    def fillNum(self, num, x, y, board):
-        board[x][y] = num
-        return board
+    # def fillNum(self, x, y, board):
+    #     board[x][y] = 0
+    #     return board
 
     # Check if there is just one solution to the board
-    def checkNum(self, num, x, y, board):
-        solutions = 0
+    def checkRemove(self, board, optBoard):        
+        if self.solutions > 1:
+            return False
+
+        if np.all(num > 0 for num in board):
+            #print(board)
+            self.solutions += 1
+        
+        optBoard = self.getOptBoard(board, optBoard)
+        lowPair = self.findLowOpt(optBoard)
+        x, y = lowPair
+        options = optBoard[x][y]
+
+        for nums in options:
+            if len(options) > 0:
+                board[x][y] = num
+                sys.setrecursionlimit(2600)
+                if self.checkRemove(board, optBoard):
+                    print("hewwo")
+                    return True
+                board[x][y] = 0
+
+        if self.solutions == 1:
+            return True
+        
+        return False
 
     # Remove a number from the board
-    def removeNum(self, num, x, y, board):
-        if self.checkRemove(num, x, y, board):
-            return self.fillNum(num, x, y, board)
+    def removeNum(self, x, y, board, optBoard):
+        board[x][y] = 0
+        self.solutions = 0
+        if self.checkRemove(board, optBoard):
+            return board
         else:
-            num = random.choice(self.numbers)
             locX = random.randint(0, 8)
-            locY = random.rantint(0, 8)
-            return self.removeNum(num, locX, locY, board)
+            locY = random.randint(0, 8)
+            return self.removeNum(locX, locY, board, optBoard)
 
-    def recFill(self, x, y, options, board):
-        if not options:
-            return
-        else:
-            row = board[x, :]
-            col = board[:, y]
-            cell = self.getCell(x, y, board)
-            nonOpts = np.union1d(row, col)
-            nonOpts = np.union1d(nonOpts, cell) 
-            options = np.setdiff1d(self.numbers, nonOpts)
-            random.shuffle(options)
+    # Recursive backtracking algorithm to fill the board all the way
+    # following sudoku rules
+    def fillBoard(self, x, y, board):
+        if y >= 9 and x < 8:
+            x += 1
+            y = 0
+        if x >= 8 and y >= 9:
+            #print(board)
+            return True
 
-        # If board is full return board
-        # Else if there are no options, backtrack
-        # Else go to the next spot
+        options = self.getOpts(x, y, board)
+        random.shuffle(options)
+
+        for num in options:
+            if len(options) > 0:
+                board[x][y] = num
+                sys.setrecursionlimit(2600)
+                if self.fillBoard(x, y+1, board):
+                    return True
+                board[x][y] = 0
+        return False
     
-    # Create completely-filled, valid board
-    def fillBoard(self, board):
+    def getOpts(self, x, y, board):
+        row = board[x, :]
+        col = board[:, y]
+        cell = self.getCell(x, y, board)
+        nonOpts = np.union1d(row, col)
+        nonOpts = np.union1d(nonOpts, cell) 
+        options = np.setdiff1d(self.numbers, nonOpts)
+
+        return options
+    
+    def getOptBoard(self, board, optBoard):
         for x in range(0, 9):
             for y in range(0, 9):
-                print("x = ", x)
-                print("y = ", y)
-                row = board[x, :]   # Get current row
-                print(row)
-                col = board[:, y]   # Get current col
-                print(col)
-                # Get the current 3x3 cell that this number is in
-                cell = self.getCell(x, y, board)    
-                print(cell)
-                # The non-options are any numbers that are already in this row or column
-                # So the union of the two arrays contains values that are in either row or column
-                nonOpts = np.union1d(row, col)
-                nonOpts = np.union1d(nonOpts, cell) 
-                print(nonOpts)
-                options = np.setdiff1d(self.numbers, nonOpts)
-                random.shuffle(options)
-                print(options)
-                for opt in options:
-                    if not options:
-                        
+                optBoard[x][y] = self.getOpts(x, y, board)
 
-                board[x][y] = random.choice(options)
-                print(board)
-            
+        return optBoard
 
-        return board
+    def findLowOpt(self, optBoard):
+        row = -1
+        col = -1
+        lowest = 9
+        lowPair = (row, col)
+        for x in range(0, 9):
+            for y in range(0, 9):
+                if len(optBoard[x][y]) < lowest:
+                    lowest = len(optBoard[x][y])
+                    lowPair = (x, y)
+
+        return lowPair
 
     def getCell(self, x, y, board):
         cell = np.zeros([0], dtype=np.int32)
@@ -143,17 +173,26 @@ class Sudoku:
             for col in range(0, 9):
                 board[row][col] = 0
 
+        x = 0
+        y = 0
+        self.fillBoard(x, y, board)
+        print(board)
 
-        board = self.fillBoard(board)
+        solution = copy.deepcopy(board)
 
-        # Generate all numbers on the board
-        # for n in range(0, self.size):
-        #     num = random.choice(self.numbers)
-        #     locX = random.randint(0, 8)
-        #     locY = random.rantint(0, 8)
-        #     self.removeNum(num, locX, locY, board)
+        optBoard = np.zeros([9, 9], dtype=object)
+        optBoard = self.getOptBoard(board, optBoard)
+        # for row in range(0, 9):
+        #     for col in range(0, 9):
+        #         print(optBoard[row][col])
+
+        # locX = random.randint(0, 8)
+        # locY = random.randint(0, 8)
+        # self.removeNum(locX, locY, board, optBoard)
+
+        for i in range(0, 45):
+            locX = random.randint(0, 8)
+            locY = random.randint(0, 8)
+            self.removeNum(locX, locY, board, optBoard)
 
         return board
-
-
-        
