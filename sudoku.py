@@ -15,6 +15,7 @@ class Sudoku:
         self.size = 36
         self.numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.solutions = 0
+        self.answer = np.zeros([9, 9], dtype=np.int32)
 
     def printClass(self):
         print("This is the sudoku class.")
@@ -176,19 +177,11 @@ class Sudoku:
         x = 0
         y = 0
         self.fillBoard(x, y, board)
-        print(board)
 
-        solution = copy.deepcopy(board)
+        self.answer = copy.deepcopy(board)
 
         optBoard = np.zeros([9, 9], dtype=object)
         optBoard = self.getOptBoard(board, optBoard)
-        # for row in range(0, 9):
-        #     for col in range(0, 9):
-        #         print(optBoard[row][col])
-
-        # locX = random.randint(0, 8)
-        # locY = random.randint(0, 8)
-        # self.removeNum(locX, locY, board, optBoard)
 
         for i in range(0, 45):
             locX = random.randint(0, 8)
@@ -196,3 +189,136 @@ class Sudoku:
             self.removeNum(locX, locY, board, optBoard)
 
         return board
+
+    def playGame(self):
+        board = self.generateGame()
+
+        # Pygame initializations
+        pygame.init()
+        pygame.display.set_caption('Sudoku Game')
+        scale = 50
+        width = scale * 9
+        height = scale * 11
+        twiceS = scale * 2
+        halfS = scale // 2
+        halfW = width // 2
+        quarterW = width // 4
+        eighthW = width // 8
+
+        running = True
+        win = False
+
+        frames = 0
+        minutes = 0
+        seconds = 0
+        total_seconds = 0
+
+        screen = pygame.display.set_mode((width, height))
+        clock = pygame.time.Clock()
+        font = pygame.font.SysFont("consola", 40)
+        small_font = pygame.font.SysFont("consola", 22)
+
+
+        # Colors
+        white = (255, 255, 255)
+        grey = (200, 200, 200)
+        dark_grey = (175, 175, 175)
+        black = (0, 0, 0)
+
+        light_red = (255, 175, 175)
+        dark_red = (230, 150, 150)
+        light_orange = (255, 200, 145)
+        light_yellow = (255, 255, 200)
+        light_green = (200, 255, 200)
+        light_blue = (200, 200, 255)
+        dark_blue = (175, 175, 230)
+        light_purple = (255, 175, 255)
+        light_pink = (255, 200, 200)
+        light_brown = (200, 150, 100)
+
+        # Default colors
+        number_color = white
+        select_color = white
+
+        check_color = grey
+        clear_color = light_blue
+        new_color = light_red
+
+        while(running):
+            # Variables for calculating time
+            if not win:
+                total_seconds = frames // 60
+                minutes = total_seconds // 60
+                seconds = total_seconds % 60
+                time = "{0:02}:{1:02}".format(minutes, seconds)
+
+            # Actions/events from input
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    running = True
+            
+            # Displaying everything on the screen
+            screen.fill(white)
+
+            # Display the board
+            for row in range(0, 9):
+                for col in range(0, 9):
+                    num = str(board[row][col])
+                    if(board[row][col] == 0):
+                        num = " "
+                    number = font.render(num, True, black, number_color)
+                    numberRect = number.get_rect()
+                    numberRect.center = (col * scale + halfS, row * scale + (scale + halfS))
+                    pygame.draw.rect(screen, number_color, [scale * col, scale * row + scale, scale, scale])
+                    screen.blit(number, numberRect)
+
+                    # Box borders
+                    pygame.draw.rect(screen, black, [scale * col, scale * row + scale, scale, scale], width=1)
+
+            # 3x3 cell borders
+            pygame.draw.rect(screen, black, [(scale * 3), scale-1, (scale * 3)+1, (scale * 9)+1], width=2)
+            pygame.draw.rect(screen, black, [0-1, (scale * 4), (scale * 9)+1, (scale * 3)+1], width=2)
+
+            # Check word and clear buttons
+            check = small_font.render("CHECK WORD", True, black, check_color)
+            checkRect = check.get_rect()
+            checkRect.center = (eighthW, halfS)
+            pygame.draw.rect(screen, check_color, [0, 0, quarterW, scale])
+            screen.blit(check, checkRect)
+
+            clear = small_font.render("CLEAR ALL", True, black, clear_color)
+            clearRect = clear.get_rect()
+            clearRect.center = (3 * (eighthW), halfS)
+            pygame.draw.rect(screen, clear_color, [quarterW, 0, halfW, scale])
+            screen.blit(clear, clearRect)
+
+            # New game button and timer
+            new = small_font.render("NEW GAME", True, black, new_color)
+            newRect = new.get_rect()
+            newRect.center = (5 * (eighthW), halfS)
+            pygame.draw.rect(screen, new_color, [halfW, 0, quarterW * 3, scale])
+            screen.blit(new, newRect)
+            
+            timer = small_font.render(time, True, black, light_orange)
+            timerRect = timer.get_rect()
+            timerRect.center = (7 * (eighthW), halfS)
+            pygame.draw.rect(screen, light_orange, [quarterW * 3, 0, width, scale])
+            screen.blit(timer, timerRect)
+
+            # Back to menu button
+            menu = small_font.render("BACK TO MENU", True, black, light_purple)
+            menuRect = menu.get_rect()
+            menuRect.center = (width // 2, (10 * scale) + (scale // 2))
+            pygame.draw.rect(screen, light_purple, [0, 10 * scale, width, height])
+            screen.blit(menu, menuRect)
+
+
+            frames += 1
+            clock.tick(60)
+
+            pygame.display.update()
+
+        pygame.quit()

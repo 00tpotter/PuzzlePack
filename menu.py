@@ -23,11 +23,11 @@ class Menu:
         self.ws_game.playGame()  
 
     def playSudoku(self):
-        board = self.sudoku_game.generateGame()
-        print(board)   
+        board = self.sudoku_game.playGame()
+        # print(board)   
 
 
 game = Menu()
 # game.printClass()
-# game.playWordSearch()
+#game.playWordSearch()
 game.playSudoku()

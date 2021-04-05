@@ -157,7 +157,6 @@ class WordSearch:
     def playGame(self):
         a = self.generateGame()
         board = copy.deepcopy(a)
-        # print(board)
 
         # Pygame initializations
         pygame.init()
@@ -166,6 +165,7 @@ class WordSearch:
         width = 17 * scale
         height = 24 * scale
         twice = scale * 2
+        half = scale // 2
         halfW = width // 2
         quarterW = width // 4
         eighthW = width // 8
@@ -351,7 +351,6 @@ class WordSearch:
                     if a[row][col] == "-":
                         a[row][col] = random.choice(self.letters)
 
-                    half = scale // 2
                     letter = font.render(a[row][col], True, black, letter_color)
                     letterRect = letter.get_rect()
                     letterRect.center = (col * scale + half, row * scale + (scale + half))
