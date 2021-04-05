@@ -244,6 +244,13 @@ class Sudoku:
         clear_color = light_blue
         new_color = light_red
 
+        # Textbox input
+        active = False
+        text = ""
+        selX = -1
+        selY = -1
+        selected = []
+
         while(running):
             # Variables for calculating time
             if not win:
@@ -258,16 +265,53 @@ class Sudoku:
                     running = False
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    running = True
-            
+                    # User clicks the mouse. Get the position
+                    pos = pygame.mouse.get_pos()
+                    # Change the x/y screen coordinates to grid coordinates
+                    column = pos[0] // scale
+                    row = (pos[1] - scale) // scale
+
+                    selY = column
+                    selX = row
+
+                    print(selX)
+                    print(selY)
+
+                    # Action for numbers being selected
+                    if (column < 9 and column >= 0) and (row < 9 and row >= 0) and not win:
+                        active = not active
+                        #number_color = light_green
+                        if (selX, selY) not in selected:
+                            selected.append((selX, selY))
+                    else:
+                        active = False
+                        #number_color = white
+
+                elif event.type == pygame.KEYDOWN:
+                    if active:
+                        if event.key == pygame.K_RETURN:
+                            text = ''
+                        elif event.key == pygame.K_BACKSPACE:
+                            text = text[:-1]
+                        else:
+                            text += event.unicode
+                            if board[selX][selY] == 0:
+                                board[selX][selY] = int(text)
+                                text = ""
+        
+
             # Displaying everything on the screen
             screen.fill(white)
 
             # Display the board
             for row in range(0, 9):
                 for col in range(0, 9):
+                    if (row, col) in selected:
+                        number_color = light_yellow
+                    else:
+                        number_color = white
                     num = str(board[row][col])
-                    if(board[row][col] == 0):
+                    if board[row][col] == 0:
                         num = " "
                     number = font.render(num, True, black, number_color)
                     numberRect = number.get_rect()
