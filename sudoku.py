@@ -20,10 +20,6 @@ class Sudoku:
     def printClass(self):
         print("This is the sudoku class.")
 
-    # def fillNum(self, x, y, board):
-    #     board[x][y] = 0
-    #     return board
-
     # Check if there is just one solution to the board
     def checkRemove(self, board, optBoard):        
         if self.solutions > 1:
@@ -192,6 +188,7 @@ class Sudoku:
 
     def playGame(self):
         board = self.generateGame()
+        temp = copy.deepcopy(board)
 
         # Pygame initializations
         pygame.init()
@@ -238,7 +235,7 @@ class Sudoku:
 
         # Default colors
         number_color = white
-        select_color = white
+        select_color = grey
 
         check_color = grey
         clear_color = light_blue
@@ -249,7 +246,8 @@ class Sudoku:
         text = ""
         selX = -1
         selY = -1
-        selected = []
+        selected = (selX, selY)
+        checked = False
 
         while(running):
             # Variables for calculating time
@@ -264,7 +262,7 @@ class Sudoku:
                 if event.type == pygame.QUIT:
                     running = False
 
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     # User clicks the mouse. Get the position
                     pos = pygame.mouse.get_pos()
                     # Change the x/y screen coordinates to grid coordinates
@@ -274,18 +272,48 @@ class Sudoku:
                     selY = column
                     selX = row
 
-                    print(selX)
-                    print(selY)
-
                     # Action for numbers being selected
-                    if (column < 9 and column >= 0) and (row < 9 and row >= 0) and not win:
-                        active = not active
-                        #number_color = light_green
-                        if (selX, selY) not in selected:
-                            selected.append((selX, selY))
+                    if (column < 9 and column >= 0) and (row < 9 and row >= 0) and not win and board[selX][selY] == 0:
+                        active = True
+                        if (selX, selY) != selected:
+                            selected = (selX, selY)
+                        else:
+                            selected = (-1, -1)
                     else:
                         active = False
-                        #number_color = white
+                        selected = (-1, -1)
+
+                    # Action for check numbers buttton pressed
+                    if (pos[0] < quarterW and pos[0] >= 0) and (pos[1] < scale and pos[1] >= 0) and not win:
+                        check_color = dark_grey
+                        checked = True
+                        # if np.array_equal(temp, self.answer):
+                        #     number_color = light_green
+                        # else:
+                        #     number_color = light_red
+
+                        selected = (-1, -1)
+
+                    # Action for clear all buttton pressed
+                    if (pos[0] < halfW and pos[0] >= quarterW) and (pos[1] < scale and pos[1] >= 0) and not win:
+                        clear_color = dark_blue
+                        temp = copy.deepcopy(board)
+                        checked = False
+
+                    # Action for new game button; resets all variables, game board, etc.
+                    if (pos[0] < quarterW * 3 and pos[0] >= halfW) and (pos[1] < scale and pos[1] >= 0):
+                        win = False
+                        board = self.generateGame()
+                        temp = copy.deepcopy(board)
+                        frames = 0
+                        minutes = 0
+                        seconds = 0
+                        total_seconds = 0
+                        selected = (-1, -1)
+                        active = False
+                        text = ""
+                        new_color = dark_red
+                        checked = False
 
                 elif event.type == pygame.KEYDOWN:
                     if active:
@@ -294,11 +322,23 @@ class Sudoku:
                         elif event.key == pygame.K_BACKSPACE:
                             text = text[:-1]
                         else:
-                            text += event.unicode
+                            text = event.unicode
                             if board[selX][selY] == 0:
-                                board[selX][selY] = int(text)
+                                temp[selX][selY] = int(text)
                                 text = ""
-        
+                                active = False
+                                selected = (-1, -1)
+
+                # Visual change for buttons being clicked
+                else:
+                    check_color = grey
+                    clear_color = light_blue
+                    new_color = light_red
+
+                    pygame.display.update()
+
+                    frames += 1
+                    clock.tick(60)
 
             # Displaying everything on the screen
             screen.fill(white)
@@ -306,12 +346,19 @@ class Sudoku:
             # Display the board
             for row in range(0, 9):
                 for col in range(0, 9):
-                    if (row, col) in selected:
+                    if (row, col) == selected:
                         number_color = light_yellow
+                    elif checked:
+                        if temp[row][col] == self.answer[row][col]:
+                            number_color = light_green
+                        else:
+                            number_color = light_red
+                    elif temp[row][col] != 0 and board[row][col] == 0:
+                        number_color = select_color
                     else:
                         number_color = white
-                    num = str(board[row][col])
-                    if board[row][col] == 0:
+                    num = str(temp[row][col])
+                    if temp[row][col] == 0:
                         num = " "
                     number = font.render(num, True, black, number_color)
                     numberRect = number.get_rect()
@@ -327,7 +374,7 @@ class Sudoku:
             pygame.draw.rect(screen, black, [0-1, (scale * 4), (scale * 9)+1, (scale * 3)+1], width=2)
 
             # Check word and clear buttons
-            check = small_font.render("CHECK WORD", True, black, check_color)
+            check = small_font.render("CHECK ANSWER", True, black, check_color)
             checkRect = check.get_rect()
             checkRect.center = (eighthW, halfS)
             pygame.draw.rect(screen, check_color, [0, 0, quarterW, scale])
