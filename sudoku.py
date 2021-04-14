@@ -39,7 +39,6 @@ class Sudoku:
                 board[x][y] = num
                 sys.setrecursionlimit(2600)
                 if self.checkRemove(board, optBoard):
-                    print("hewwo")
                     return True
                 board[x][y] = 0
 

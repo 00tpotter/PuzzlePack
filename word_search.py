@@ -112,7 +112,7 @@ class WordSearch:
             return self.addWord(word, locX, locY, direction, board)
 
     def generateGame(self):
-        board = np.zeros([self.size, self.size], dtype=np.str)
+        board = np.zeros([self.size, self.size], dtype=str)
 
         # Fill the array with -'s as placeholders
         for row in range(0, self.size):
