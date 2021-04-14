@@ -27,7 +27,7 @@ class WordSearch:
                            "SW", "S", "SE"]
 
     def printClass(self):
-        print("This is the word search class.")
+        return "This is the word search class."
 
     def checkWord(self, word, x, y, dir, board):
         if word in self.usedWords:

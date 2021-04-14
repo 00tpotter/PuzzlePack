@@ -1,0 +1,6 @@
+README.md
+setup.py
+PuzzlePack.egg-info/PKG-INFO
+PuzzlePack.egg-info/SOURCES.txt
+PuzzlePack.egg-info/dependency_links.txt
+PuzzlePack.egg-info/top_level.txt
