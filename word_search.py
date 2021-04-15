@@ -20,6 +20,10 @@ class WordSearch:
         self.textFile = open("words.txt", "r")
         self.wordsList = self.textFile.read().splitlines()
 
+        self.score_file = open("ws_high_score.txt", "r")
+        self.score = self.score_file.read().splitlines()      # read in the best time/high score
+        self.score_file.close()
+
         self.usedWords = []
 
         self.directions = ["NW", "N", "NE",
@@ -266,9 +270,9 @@ class WordSearch:
                     # Action for new game button; resets all variables, game board, etc.
                     if (pos[0] < quarterW * 3 and pos[0] >= halfW) and (pos[1] < scale and pos[1] >= 0):
                         win = False
-                        #score_file = open("high_score.txt", "r")
-                        #score = score_file.read().splitlines()   # read in the best time/high score
-                        #score_file.close()
+                        self.score_file = open("ws_high_score.txt", "r")
+                        self.score = self.score_file.read().splitlines()   # read in the best time/high score
+                        self.score_file.close()
                         self.usedWords = []
                         a = self.generateGame()
                         board = copy.deepcopy(a)
@@ -412,16 +416,16 @@ class WordSearch:
             # Win condition
             if len(correct) == self.numberOfWords:
                 win = True
-                text = "{0:02}:{1:02}".format(int(score[0]), int(score[1]))
-                #print(score)
-                if int(score[0]) > minutes or (int(score[0]) >= minutes and int(score[1]) > seconds):
-                    #score_file = open("high_score.txt", "w")
-                    #score = [str(minutes), str(seconds)]
-                    with open("high_score.txt", "w") as out:
+                text = "{0:02}:{1:02}".format(int(self.score[0]), int(self.score[1]))
+                
+                if int(self.score[0]) > minutes or (int(self.score[0]) >= minutes and int(self.score[1]) > seconds):
+                    self.score_file = open("ws_high_score.txt", "w")
+                    self.score = [str(minutes), str(seconds)]
+                    with open("ws_high_score.txt", "w") as out:
                         out.write("{}\n{}".format(str(minutes), str(seconds)))
-                    #score_file.writelines(score)
+                    self.score_file.writelines(self.score)
                     text = "{0:02}:{1:02}".format(minutes, seconds)
-                    score_file.close()
+                    self.score_file.close()
 
                 complete = font.render("Puzzle complete! Best time: " + text, True, black, light_orange)
                 completeRect = complete.get_rect()

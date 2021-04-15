@@ -29,5 +29,5 @@ class Menu:
 
 game = Menu()
 # game.printClass()
-# game.playWordSearch()
-game.playSudoku()
+game.playWordSearch()
+# game.playSudoku()

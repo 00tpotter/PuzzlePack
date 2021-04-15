@@ -26,7 +26,6 @@ class Sudoku:
             return False
 
         if np.all(num > 0 for num in board):
-            #print(board)
             self.solutions += 1
         
         optBoard = self.getOptBoard(board, optBoard)
@@ -286,10 +285,6 @@ class Sudoku:
                     if (pos[0] < quarterW and pos[0] >= 0) and (pos[1] < scale and pos[1] >= 0) and not win:
                         check_color = dark_grey
                         checked = True
-                        # if np.array_equal(temp, self.answer):
-                        #     number_color = light_green
-                        # else:
-                        #     number_color = light_red
 
                         selected = (-1, -1)
 
