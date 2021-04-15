@@ -18,7 +18,7 @@ class Sudoku:
         self.answer = np.zeros([9, 9], dtype=np.int32)
 
     def printClass(self):
-        print("This is the sudoku class.")
+        return "This is the Sudoku class."
 
     # Check if there is just one solution to the board
     def checkRemove(self, board, optBoard):        
@@ -65,7 +65,6 @@ class Sudoku:
             x += 1
             y = 0
         if x >= 8 and y >= 9:
-            #print(board)
             return True
 
         options = self.getOpts(x, y, board)
@@ -172,6 +171,7 @@ class Sudoku:
         x = 0
         y = 0
         self.fillBoard(x, y, board)
+        print(board)
 
         self.answer = copy.deepcopy(board)
 

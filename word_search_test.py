@@ -4,11 +4,6 @@ import pytest
 import numpy as np
 import word_search
 
-#class WordSearchTest:
-    # def __init__(self):
-    #     self.wordSearch = word_search.WordSearch()
-
-# Arrange, get word_search object
 @pytest.fixture
 def getWS():  
     return word_search.WordSearch()
@@ -66,4 +61,3 @@ def test_generateGame(getWS, getBoard):
     for row in range(0, getWS.size):
         for col in range(0, getWS.size):
             assert result[row][col] is not test[row][col]
-    
