@@ -170,7 +170,6 @@ class Sudoku:
         x = 0
         y = 0
         self.fillBoard(x, y, board)
-        print(board)
 
         self.answer = copy.deepcopy(board)
 
@@ -187,6 +186,10 @@ class Sudoku:
     def playGame(self):
         board = self.generateGame()
         temp = copy.deepcopy(board)
+
+        score_file = open("sudoku_high_score.txt", "r")
+        score = score_file.read().splitlines()      # read in the best time/high score
+        score_file.close()
 
         # Pygame initializations
         pygame.init()
@@ -211,7 +214,7 @@ class Sudoku:
         screen = pygame.display.set_mode((width, height))
         clock = pygame.time.Clock()
         font = pygame.font.SysFont("consola", 40)
-        small_font = pygame.font.SysFont("consola", 22)
+        small_font = pygame.font.SysFont("consola", 24)
 
 
         # Colors
@@ -246,6 +249,8 @@ class Sudoku:
         selY = -1
         selected = (selX, selY)
         checked = False
+
+        correct = 0
 
         while(running):
             # Variables for calculating time
@@ -292,6 +297,7 @@ class Sudoku:
                     if (pos[0] < halfW and pos[0] >= quarterW) and (pos[1] < scale and pos[1] >= 0) and not win:
                         clear_color = dark_blue
                         temp = copy.deepcopy(board)
+                        correct = 0
                         checked = False
 
                     # Action for new game button; resets all variables, game board, etc.
@@ -299,6 +305,9 @@ class Sudoku:
                         win = False
                         board = self.generateGame()
                         temp = copy.deepcopy(board)
+                        score_file = open("sudoku_high_score.txt", "r")
+                        score = score_file.read().splitlines()      # read in the best time/high score
+                        score_file.close()
                         frames = 0
                         minutes = 0
                         seconds = 0
@@ -308,6 +317,7 @@ class Sudoku:
                         text = ""
                         new_color = dark_red
                         checked = False
+                        correct = 0
 
                 elif event.type == pygame.KEYDOWN:
                     if active:
@@ -345,6 +355,7 @@ class Sudoku:
                     elif checked:
                         if temp[row][col] == self.answer[row][col]:
                             number_color = light_green
+                            correct += 1
                         else:
                             number_color = light_red
                     elif temp[row][col] != 0 and board[row][col] == 0:
@@ -368,26 +379,38 @@ class Sudoku:
             pygame.draw.rect(screen, black, [0-1, (scale * 4), (scale * 9)+1, (scale * 3)+1], width=2)
 
             # Check word and clear buttons
-            check = small_font.render("CHECK ANSWER", True, black, check_color)
+            check = small_font.render("CHECK", True, black, check_color)
+            answer = small_font.render("ANSWER", True, black, check_color)
             checkRect = check.get_rect()
-            checkRect.center = (eighthW, halfS)
+            checkRect.center = (eighthW, halfS // 1.5)
+            answerRect = answer.get_rect()
+            answerRect.center = (eighthW, halfS + (halfS // 2))
             pygame.draw.rect(screen, check_color, [0, 0, quarterW, scale])
             screen.blit(check, checkRect)
+            screen.blit(answer, answerRect)
 
-            clear = small_font.render("CLEAR ALL", True, black, clear_color)
+            clear = small_font.render("CLEAR", True, black, clear_color)
+            allWord = small_font.render("ALL", True, black, clear_color)
             clearRect = clear.get_rect()
-            clearRect.center = (3 * (eighthW), halfS)
+            clearRect.center = (3 * (eighthW), halfS // 1.5)
+            allRect = allWord.get_rect()
+            allRect.center = (3 * (eighthW), halfS + (halfS // 2))
             pygame.draw.rect(screen, clear_color, [quarterW, 0, halfW, scale])
             screen.blit(clear, clearRect)
+            screen.blit(allWord, allRect)
 
             # New game button and timer
-            new = small_font.render("NEW GAME", True, black, new_color)
+            new = small_font.render("NEW", True, black, new_color)
+            gameWord = small_font.render("GAME", True, black, new_color)
             newRect = new.get_rect()
-            newRect.center = (5 * (eighthW), halfS)
+            newRect.center = (5 * (eighthW), halfS // 1.5)
+            gameRect = gameWord.get_rect()
+            gameRect.center = (5 * (eighthW), halfS + (halfS // 2))
             pygame.draw.rect(screen, new_color, [halfW, 0, quarterW * 3, scale])
             screen.blit(new, newRect)
+            screen.blit(gameWord, gameRect)
             
-            timer = small_font.render(time, True, black, light_orange)
+            timer = font.render(time, True, black, light_orange)
             timerRect = timer.get_rect()
             timerRect.center = (7 * (eighthW), halfS)
             pygame.draw.rect(screen, light_orange, [quarterW * 3, 0, width, scale])
@@ -400,6 +423,22 @@ class Sudoku:
             pygame.draw.rect(screen, light_purple, [0, 10 * scale, width, height])
             screen.blit(menu, menuRect)
 
+            # Win condition
+            if correct >= 81:
+                win = True
+                text = "{0:02}:{1:02}".format(int(score[0]), int(score[1]))
+                
+                if int(score[0]) > minutes or (int(score[0]) >= minutes and int(score[1]) > seconds):
+                    with open("sudoku_high_score.txt", "w") as out:
+                        out.write("{}\n{}".format(str(minutes), str(seconds)))
+                    text = "{0:02}:{1:02}".format(minutes, seconds)
+                    score_file.close()
+
+                complete = small_font.render("Puzzle complete! Best time: " + text, True, black, light_orange)
+                completeRect = complete.get_rect()
+                completeRect.center = (width // 2, (10 * scale) + (scale // 2))
+                pygame.draw.rect(screen, light_orange, [0, 10 * scale, width, height])
+                screen.blit(complete, completeRect)
 
             frames += 1
             clock.tick(60)

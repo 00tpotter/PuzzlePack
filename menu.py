@@ -2,7 +2,7 @@
 import word_search
 #import chess
 import sudoku
-#import minesweeper
+import minesweeper
 import pygame
 
 class Menu:    
@@ -10,7 +10,7 @@ class Menu:
         self.ws_game = word_search.WordSearch()
         #self.chess_game = chess.Chess()
         self.sudoku_game = sudoku.Sudoku()
-        #self.ms_game = minesweeper.Minesweeper()
+        self.ms_game = minesweeper.Minesweeper()
 
     def printClass(self):
         print("This is the menu class.")
@@ -23,11 +23,15 @@ class Menu:
         self.ws_game.playGame()  
 
     def playSudoku(self):
-        board = self.sudoku_game.playGame()
-        # print(board)   
+        self.sudoku_game.playGame()
+
+    def playMinesweeper(self):
+        self.ms_game.playGame()
+        
 
 
 game = Menu()
 # game.printClass()
-game.playWordSearch()
+# game.playWordSearch()
 # game.playSudoku()
+game.playMinesweeper()

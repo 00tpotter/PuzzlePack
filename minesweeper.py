@@ -9,7 +9,7 @@ pygame.font.init()
 # Minesweeper class4
 WIDTH = 1000
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("MineSweeper")
+pygame.display.set_caption("Minesweeper")
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 GREY = (128, 128, 128)
@@ -162,7 +162,8 @@ class Minesweeper:
 
         
 
-    def main(self):
+    def playGame(self):
+
         while True:
             pygame.time.delay(50)
             for event in pygame.event.get():
@@ -198,5 +199,6 @@ class Minesweeper:
             update_display(self.board)
 
 
-mines = Minesweeper()
-mines.main()
+
+# mines = Minesweeper()
+# mines.main()
