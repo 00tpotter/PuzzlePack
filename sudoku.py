@@ -252,7 +252,7 @@ class Sudoku:
 
         correct = 0
 
-        while(running):
+        while running:
             # Variables for calculating time
             if not win:
                 total_seconds = frames // 60

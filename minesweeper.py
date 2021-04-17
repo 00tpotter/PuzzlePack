@@ -8,8 +8,7 @@ pygame.font.init()
 
 # Minesweeper class4
 WIDTH = 1000
-WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("Minesweeper")
+
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 GREY = (128, 128, 128)
@@ -108,25 +107,10 @@ class Board:
         elif self.win:
             WIN.blit(self.winimg, (150, WIDTH/2 -100))
 
-def findNode(pos, rows):
-    x,y = pos
-    squareSize = WIDTH/rows
-    row = y // squareSize
-    col = x // squareSize
-    return [row,col]
 
-
-def update_display(board):
-    for row in board.board:
-        for square in row:
-            square.draw(WIN)
-    if board.lose:
-        board.draw(WIN)
-    if board.win:
-        board.draw(WIN)
-    pygame.display.update()
 
 class Minesweeper:
+    
     numFlags = 0
     revealedSquares = 0
     def __init__(self):
@@ -160,10 +144,28 @@ class Minesweeper:
                     continue
                 self.reveal(x + i, y + j)
 
-        
+
+    def findNode(self, pos, rows):
+        x,y = pos
+        squareSize = WIDTH/rows
+        row = y // squareSize
+        col = x // squareSize
+        return [row,col]
+
+
+    def update_display(self, board, WIN):
+        for row in board.board:
+            for square in row:
+                square.draw(WIN)
+        if board.lose:
+            board.draw(WIN)
+        if board.win:
+            board.draw(WIN)
+        pygame.display.update() 
 
     def playGame(self):
-
+        WIN = pygame.display.set_mode((WIDTH, WIDTH))
+        pygame.display.set_caption("Minesweeper")
         while True:
             pygame.time.delay(50)
             for event in pygame.event.get():
@@ -173,7 +175,7 @@ class Minesweeper:
                 if event.type == pygame.MOUSEBUTTONDOWN and self.board.lose == False and self.board.win == False:
                     if event.button == 1:
                         pos = pygame.mouse.get_pos()
-                        [x,y] = findNode(pos, self.rows)
+                        [x,y] = self.findNode(pos, self.rows)
                         x = int(x)
                         y = int(y)
                         clicked = self.board.board[x][y]
@@ -185,7 +187,7 @@ class Minesweeper:
                                 self.board.win = True
                     if event.button == 3:
                         pos = pygame.mouse.get_pos()
-                        [x,y] = findNode(pos, self.rows)
+                        [x,y] = self.findNode(pos, self.rows)
                         x = int(x)
                         y = int(y)
                         clicked = self.board.board[x][y]
@@ -196,7 +198,7 @@ class Minesweeper:
                             elif clicked.mark:
                                 clicked.mark = False
                                 self.numFlags -= 1
-            update_display(self.board)
+            self.update_display(self.board, WIN)
 
 
 
