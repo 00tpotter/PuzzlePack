@@ -147,23 +147,29 @@ class Menu:
                     sudBorder = 0
                     if playSud:
                         self.playSudoku()
+                        screen = pygame.display.set_mode((width, height))
+                    playSud = False
 
                     wordText = white
                     wordBack = black
                     wordBorder = 0
                     if playWord:
                         self.playWordSearch()
+                        screen = pygame.display.set_mode((width, height))
+                    playWord = False
 
                     mineText = white
                     mineBack = black
                     mineBorder = 0
                     if playMine:
                         self.playMinesweeper()
+                        screen = pygame.display.set_mode((width, height))
+                    playMine = False
 
                     chText = white
                     chBack = black
                     chBorder = 0
-
+                    
                     frames += 1
                     clock.tick(60)
                     pygame.display.update()
@@ -204,10 +210,9 @@ class Menu:
             frames += 1
             clock.tick(60)
             pygame.display.update()
+        
+        #pygame.display.update()
+        pygame.quit()
 
 game = Menu()
-# game.printClass()
-# game.playWordSearch()
-# game.playSudoku()
-# game.playMinesweeper()
 game.chooseGame()

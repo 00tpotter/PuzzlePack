@@ -234,6 +234,7 @@ class WordSearch:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    pygame.quit()
 
                 # Events related to left click mouse down
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -284,6 +285,10 @@ class WordSearch:
                         correct = []
                         correctLetters = []
                         new_color = dark_red
+
+                    # Action for back to menu button
+                    if (pos[0] < width and pos[0] >= 0) and (pos[1] < height and pos[1] >= 23 * scale):
+                        running = False
 
                 # Events related to left click mouse up
                 elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -435,7 +440,7 @@ class WordSearch:
 
             pygame.display.update()
         
-        pygame.quit()
+        #pygame.quit()
 
 # test = WordSearch()
 # test.playGame()

@@ -319,6 +319,10 @@ class Sudoku:
                         checked = False
                         correct = 0
 
+                    # Action for back to menu button
+                    if (pos[0] < width and pos[0] >= 0) and (pos[1] < height and pos[1] >= scale * 10):
+                        running = False
+
                 elif event.type == pygame.KEYDOWN:
                     if active:
                         if event.key == pygame.K_RETURN:
@@ -445,4 +449,4 @@ class Sudoku:
 
             pygame.display.update()
 
-        pygame.quit()
+        #pygame.quit()
