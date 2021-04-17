@@ -424,7 +424,7 @@ class Sudoku:
             screen.blit(menu, menuRect)
 
             # Win condition
-            if correct >= 81:
+            if correct > 81:
                 win = True
                 text = "{0:02}:{1:02}".format(int(score[0]), int(score[1]))
                 

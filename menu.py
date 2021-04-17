@@ -70,6 +70,28 @@ class Menu:
         light_pink = (255, 200, 200)
         light_brown = (200, 150, 100)
 
+        # Color effects for each button
+        playSud = False
+        sudText = white
+        sudBack = black
+        sudBorder = 0
+
+        playWord = False
+        wordText = white
+        wordBack = black
+        wordBorder = 0
+
+        playMine = False
+        mineText = white
+        mineBack = black
+        mineBorder = 0
+
+        playCh = False
+        chText = white
+        chBack = black
+        chBorder = 0
+
+
         textColor = white
         backColor = black
         border = 0
@@ -86,10 +108,65 @@ class Menu:
                     # User clicks the mouse. Get the position
                     pos = pygame.mouse.get_pos()
 
+                    x = pos[0]
+                    y = pos[1]
+
+                    # Sudoku button pressed
+                    if (x <= scale * 14 and x >= scale * 10) and (y >= scale + quarterS and y <= scale * 3 - quarterS):
+                        sudText = black
+                        sudBack = white
+                        sudBorder = 2
+                        playSud = True
+                        
+
+                    # Word Search button pressed
+                    if (x <= scale * 14 and x >= scale * 10) and (y >= scale * 3 + quarterS and y <= scale * 5 - quarterS):
+                        wordText = black
+                        wordBack = white
+                        wordBorder = 2
+                        playWord = True
+
+                    # Minesweeper button pressed
+                    if (x <= scale * 14 and x >= scale * 10) and (y >= scale * 5 + quarterS and y <= scale * 7 - quarterS):
+                        mineText = black
+                        mineBack = white
+                        mineBorder = 2
+                        playMine = True
+
+                    # Chess button pressed
+                    if (x <= scale * 14 and x >= scale * 10) and (y >= scale * 7 + quarterS and y <= scale * 9 - quarterS):
+                        chText = black
+                        chBack = white
+                        chBorder = 2
+                        playCh = True
+
+                # Reset visual changes in button clicks
                 else:
-                    pygame.display.update()
+                    sudText = white
+                    sudBack = black
+                    sudBorder = 0
+                    if playSud:
+                        self.playSudoku()
+
+                    wordText = white
+                    wordBack = black
+                    wordBorder = 0
+                    if playWord:
+                        self.playWordSearch()
+
+                    mineText = white
+                    mineBack = black
+                    mineBorder = 0
+                    if playMine:
+                        self.playMinesweeper()
+
+                    chText = white
+                    chBack = black
+                    chBorder = 0
+
                     frames += 1
                     clock.tick(60)
+                    pygame.display.update()
 
             # Displaying everything on the screen
             screen.fill(white)
@@ -97,34 +174,32 @@ class Menu:
             screen.blit(image, (0, 0))
 
             # Sudoku button
-            sud = font.render("SUDOKU", True, textColor, backColor)
+            sud = font.render("SUDOKU", True, sudText, sudBack)
             sudRect = sud.get_rect()
             sudRect.center = (scale * 12, scale * 2)
-            pygame.draw.rect(screen, black, [scale * 10, scale + quarterS, scale * 4, scale * 2 - halfS], border)
+            pygame.draw.rect(screen, black, [scale * 10, scale + quarterS, scale * 4, scale * 2 - halfS], sudBorder)
             screen.blit(sud, sudRect)
 
             # Word search button
-            word = font.render("WORD SEARCH", True, textColor, backColor)
+            word = font.render("WORD SEARCH", True, wordText, wordBack)
             wordRect = word.get_rect()
             wordRect.center = (scale * 12, scale * 4)
-            pygame.draw.rect(screen, black, [scale * 10, scale * 3 + quarterS, scale * 4, scale * 2 - halfS], border)
+            pygame.draw.rect(screen, black, [scale * 10, scale * 3 + quarterS, scale * 4, scale * 2 - halfS], wordBorder)
             screen.blit(word, wordRect)
 
             # Minesweeper button
-            mine = font.render("MINESWEEPER", True, textColor, backColor)
+            mine = font.render("MINESWEEPER", True, mineText, mineBack)
             mineRect = mine.get_rect()
             mineRect.center = (scale * 12, scale * 6)
-            pygame.draw.rect(screen, black, [scale * 10, scale * 5 + quarterS, scale * 4, scale * 2 - halfS], border)
+            pygame.draw.rect(screen, black, [scale * 10, scale * 5 + quarterS, scale * 4, scale * 2 - halfS], mineBorder)
             screen.blit(mine, mineRect)
 
             # Chess puzzle button
-            ch = font.render("CHESS", True, textColor, backColor)
+            ch = font.render("CHESS", True, chText, chBack)
             chRect = ch.get_rect()
             chRect.center = (scale * 12, scale * 8)
-            pygame.draw.rect(screen, black, [scale * 10, scale * 7 + quarterS, scale * 4, scale * 2 - halfS], border)
+            pygame.draw.rect(screen, black, [scale * 10, scale * 7 + quarterS, scale * 4, scale * 2 - halfS], chBorder)
             screen.blit(ch, chRect)
-
-
 
             frames += 1
             clock.tick(60)
