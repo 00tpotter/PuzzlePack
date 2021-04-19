@@ -2,6 +2,7 @@
 import pygame
 import time
 import sys
+import random
 from typing import List
 
 WIDTH = 800
@@ -31,6 +32,7 @@ class Piece:
     type = 0
     side = 0
     moved = False
+    enPassant = False
     def __init__(self, type):
         self.type = type
         
@@ -103,6 +105,33 @@ class Piece:
             out = "bug"
         return out
 
+def squareToIndex(stringMove):
+    num1 = -1
+    num2 = -1
+    p = stringMove[0]
+    if p == 'a':
+        num1 = 1
+    if p == 'b':
+            num1 = 2
+    if p == 'c':
+        num1 = 3
+    if p == 'd':
+        num1 = 4
+    if p == 'e':
+        num1 = 5
+    if p == 'f':
+        num1 = 6
+    if p == 'g':
+        num1 = 7
+    if p == 'h':
+        num1 = 8
+    num2 = (8 - int(stringMove[1])) * 8 - 1
+    return num2 + num1
+
+def loadPuzzles():
+    text = open("cpuzzles.txt", "r")
+    lines = [line.split(',') for line in text]
+    return lines
 
 class Square:
     occupiedBy = None
@@ -139,7 +168,6 @@ class Square:
         self.occupiedBy = None
         self.hasPiece = False
 
-
 class Board:
     board: List[Square] = [Square(i) for i in range(64)]
 
@@ -154,7 +182,17 @@ class Board:
 
     def positionFromFen(self, fen):
         pos = 0
-        for i in range(len(fen)):
+        first = fen.index(" ")
+        second = fen.index(" ", first + 1)
+        third = fen.index(" ", second + 1)
+        fourth = fen.index(" ", third + 1)
+        turn = 0
+        C1 = False
+        C2 = False
+        C3 = False
+        C4 = False
+        enPassant = -1
+        for i in range(first):
             x = fen[i]
             if (x.isdigit()):
                 pos += int(x)
@@ -201,6 +239,43 @@ class Board:
                 pygame.quit()
                 sys.exit()
 
+        if fen[first + 1] == 'b':
+            turn = 1
+
+        for i in range(second+1, third):
+            if fen[i] == 'K':
+                C1 = True
+            if fen[i] == 'Q':
+                C2 = True
+            if fen[i] == 'k':
+                C3 = True
+            if fen[i] == 'q':
+                C4 = True
+        
+        num1 = -1
+        num2 = -1
+        if fen[third + 1] != '-':
+            p = fen[third + 1]
+            if p == 'a':
+                num1 = 1
+            if p == 'b':
+                num1 = 2
+            if p == 'c':
+                num1 = 3
+            if p == 'd':
+                num1 = 4
+            if p == 'e':
+                num1 = 5
+            if p == 'f':
+                num1 = 6
+            if p == 'g':
+                num1 = 7
+            if p == 'h':
+                num1 = 8
+            num2 = (8 - int(fen[third + 2])) * 8 - 1
+            enPassant = num1 + num2
+        return [turn, C1, C2, C3, C4, enPassant]      
+        
 def selectPiece(B, index):
     piece = B.board[index].occupiedBy
     if piece.type == 2:
@@ -235,6 +310,15 @@ def pawn_moves_w(B, index):
         if B.board[index-9].hasPiece:
             if B.board[index - 9].occupiedBy.side == 1:
                 moves.append(index - 9)
+    if (index < 31 and index > 23):
+        if B.board[index + 1].hasPiece:
+            if B.board[index + 1].occupiedBy.side == 1 and B.board[index + 1].occupiedBy.enPassant:
+                moves.append(index - 7)
+    if (index < 32 and index > 24):
+        if B.board[index - 1].hasPiece:
+            if B.board[index - 1].occupiedBy.side == 1 and B.board[index - 1].occupiedBy.enPassant:
+                moves.append(index - 9)
+
     return moves
 
 def pawn_moves_b(B, index):
@@ -253,6 +337,15 @@ def pawn_moves_b(B, index):
         if B.board[index+9].hasPiece:
             if B.board[index + 9].occupiedBy.side == 0:
                 moves.append(index + 9)
+    if (index < 39 and index > 31):
+        if B.board[index + 1].hasPiece:
+            if B.board[index + 1].occupiedBy.side == 0 and B.board[index + 1].occupiedBy.enPassant:
+                moves.append(index + 9)
+    if (index < 40 and index > 32):
+        if B.board[index - 1].hasPiece:
+            if B.board[index - 1].occupiedBy.side == 0 and B.board[index - 1].occupiedBy.enPassant:
+                moves.append(index + 7)
+
     return moves
 
 def knight_moves(B, index):
@@ -341,6 +434,22 @@ def king_moves(B, index):
                 moves.append(posIndex)
             elif B.board[posIndex].occupiedBy.side != side:
                 moves.append(posIndex)
+    king = B.board[index].occupiedBy
+    if king.side == 0:
+        if king.hasMoved() == False and B.board[63].hasPiece:
+            if B.board[61].hasPiece == False and B.board[62].hasPiece == False and B.board[63].occupiedBy.hasMoved() == False:
+                moves.append(62)
+        if king.hasMoved() == False and B.board[56].hasPiece:
+            if B.board[59].hasPiece == False and B.board[58].hasPiece == False and B.board[57].hasPiece == False and B.board[56].occupiedBy.hasMoved() == False:
+                moves.append(58)
+    if king.side == 1:
+        if king.hasMoved() == False and B.board[7].hasPiece:
+            if B.board[5].hasPiece == False and B.board[6].hasPiece == False and B.board[7].occupiedBy.hasMoved() == False:
+                moves.append(6)
+        if king.hasMoved() == False and B.board[0].hasPiece:
+            if B.board[3].hasPiece == False and B.board[2].hasPiece == False and B.board[1].hasPiece == False and B.board[0].occupiedBy.hasMoved() == False:
+                moves.append(2)
+    
     return moves
 
 def on_board(position):
@@ -369,69 +478,166 @@ def findNode(pos):
 
 def main(WIN, WIDTH):
     B = Board()
-    B.positionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
-    B.printBoard()
-    pygame.init()
-    moveNum = 0
-    moves = []
-    selected = False
-    selectedSquare = -1
-    while True:
-        pygame.time.delay(50)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                sq = findNode(pos)
-                if selected == False:
-                    if B.board[sq].hasPiece:
-                        piece = B.board[sq].occupiedBy
-                        if (piece.side == moveNum % 2):
-                            moves = selectPiece(B, sq)
-                            highlight_squares(B, moves)
-                            selectedSquare = sq
-                            selected = True
-                        else:
-                            print("It is not your turn!")
-                    else:
-                        print("No piece here")
-                else:
-                    choseMove = False
-                    for i in moves:
-                        if i == sq:
-                            piece = B.board[selectedSquare].occupiedBy
-                            B.board[sq].placePiece(piece)
-                            B.board[selectedSquare].movePiece()
-                            selectedSquare = -1
-                            selected = False
-                            unhighlight_squares(B, moves)
-                            moves = []
-                            moveNum += 1
-                            choseMove = True
-                    if choseMove == False:
+    counter = -1
+    puzzles = loadPuzzles()
+    temp = list(range(0, len(puzzles)))
+    random.shuffle(temp)
+    for puzzleNum in temp:
+        counter += 1
+        for sq in B.board:
+            sq.movePiece()
+        fen = puzzles[puzzleNum][0]
+        [t, c1, c2, c3, c4, ep] = B.positionFromFen(fen)
+        if (c1 == False):
+            if B.board[63].hasPiece:
+                B.board[63].occupiedBy.moved = True
+        if (c2 == False):
+            if B.board[56].hasPiece:
+                B.board[56].occupiedBy.moved = True
+        if (c3 == False):
+            if B.board[7].hasPiece:
+                B.board[7].occupiedBy.moved = True
+        if (c4 == False):
+            if B.board[0].hasPiece:
+                B.board[0].occupiedBy.moved = True
+        if ep != -1:
+            B.board[ep].occupiedBy.enPassant = True
+        B.printBoard()
+        pygame.init()
+        moveNum = t
+        correct = True
+        moves = []
+        selected = False
+        selectedSquare = -1
+
+
+        moveList = puzzles[puzzleNum][1:]
+        for move in range(len(moveList)):
+
+            computerMove = False
+            if move % 2 == 1:
+                computerMove = True
+            wholeMove = moveList[move]
+            move1 = wholeMove[0:2]
+            move2 = wholeMove[2:4]
+            m1 = squareToIndex(move1)
+            m2 = squareToIndex(move2)
+            moveNotMade = True
+
+            while moveNotMade:
+                pygame.time.delay(25)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if computerMove:
+                        pygame.time.delay(500)
+                        moves = selectPiece(B, m1)
+                        highlight_squares(B, moves)
+                        update_display(WIN, B)
+                        pygame.time.delay(500)
+                        piece = B.board[m1].occupiedBy
+                        B.board[m2].placePiece(piece)
+                        B.board[m1].movePiece()
                         unhighlight_squares(B, moves)
-                        moves = []
-                        if B.board[sq].hasPiece:
-                            piece = B.board[sq].occupiedBy
-                            if (piece.side == moveNum % 2):
-                                moves = selectPiece(B, sq)
-                                highlight_squares(B, moves)
-                                selectedSquare = sq
-                                selected = True
+                        update_display(WIN, B)
+                        moveNotMade = False
+                        moveNum += 1
+                        break
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        pos = pygame.mouse.get_pos()
+                        sq = findNode(pos)
+                        
+                        if selected == False:
+                            if B.board[sq].hasPiece:
+                                piece = B.board[sq].occupiedBy
+                                if (piece.side == moveNum % 2):
+                                    moves = selectPiece(B, sq)
+                                    highlight_squares(B, moves)
+                                    selectedSquare = sq
+                                    selected = True
+                                else:
+                                    print("It is not your turn!")
                             else:
-                                print("It is not your turn!")
+                                print("No piece here")
                         else:
-                            print("No piece here")
-                    else:
-                        choseMove = False
+                            choseMove = False
+                            for i in moves:
+                                if i == sq:
+                                    piece = B.board[selectedSquare].occupiedBy
+                                    if sq != m2 or selectedSquare != m1:
+                                        print("game over!")
+                                        moveNotMade = False
+                                        correct = False
+                                        break
+                                    if piece.type == 2:
+                                        if (abs(selectedSquare - sq) == 16):
+                                            piece.enPassant = True
+                                        elif abs(selectedSquare - sq) != 8:
+                                            if B.board[sq].hasPiece == False:
+                                                if piece.side == 0:
+                                                    B.board[sq + 8].occupiedBy = None
+                                                    B.board[sq + 8].hasPiece = False
+                                                else:
+                                                    B.board[sq - 8].occupiedBy = None
+                                                    B.board[sq - 8].hasPiece = False
+                                    if piece.type == 1:
+                                        if (selectedSquare - sq == -2):
+                                            rook = B.board[selectedSquare + 3].occupiedBy
+                                            B.board[selectedSquare + 1].placePiece(rook)
+                                            B.board[selectedSquare + 3].movePiece()
+                                        if (selectedSquare - sq == 2):
+                                            rook = B.board[selectedSquare - 4].occupiedBy
+                                            B.board[selectedSquare - 1].placePiece(rook)
+                                            B.board[selectedSquare - 4].movePiece()
+
+                                    B.board[sq].placePiece(piece)
+                                    B.board[selectedSquare].movePiece()
+                                    selectedSquare = -1
+                                    selected = False
+                                    unhighlight_squares(B, moves)
+                                    moves = []
+                                    moveNum += 1
+                                    moveNotMade = False
+                                    choseMove = True
+                                    piece.moved = True
+                                    for s in B.board:
+                                        if s.occupiedBy != None:
+                                            if s.occupiedBy.type == 2 and s.occupiedBy.side == moveNum % 2:
+                                                s.occupiedBy.enPassant = False
+                            
+                            if correct == False:
+                                break
+
+                            if choseMove == False:
+                                unhighlight_squares(B, moves)
+                                moves = []
+                                if B.board[sq].hasPiece:
+                                    piece = B.board[sq].occupiedBy
+                                    if (piece.side == moveNum % 2):
+                                        moves = selectPiece(B, sq)
+                                        highlight_squares(B, moves)
+                                        selectedSquare = sq
+                                        selected = True
+                                    else:
+                                        print("It is not your turn!")
+                                else:
+                                    print("No piece here")
+                            else:
+                                choseMove = False
 
 
+                update_display(WIN, B)
+                if correct == False:
+                    break
+        if correct:
+            print("correct")
+        else:
+            break
+    print("this signals you either beat the game or lost")
+    print("final score: " + str(counter))
 
 
-
-            update_display(WIN, B)
 
     
 class Chess:
