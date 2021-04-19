@@ -147,6 +147,7 @@ class Menu:
                     sudBorder = 0
                     if playSud:
                         self.playSudoku()
+                        pygame.display.set_caption('Puzzle Pack')
                         screen = pygame.display.set_mode((width, height))
                     playSud = False
 
@@ -155,6 +156,7 @@ class Menu:
                     wordBorder = 0
                     if playWord:
                         self.playWordSearch()
+                        pygame.display.set_caption('Puzzle Pack')
                         screen = pygame.display.set_mode((width, height))
                     playWord = False
 
@@ -163,6 +165,7 @@ class Menu:
                     mineBorder = 0
                     if playMine:
                         self.playMinesweeper()
+                        pygame.display.set_caption('Puzzle Pack')
                         screen = pygame.display.set_mode((width, height))
                     playMine = False
 

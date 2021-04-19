@@ -424,7 +424,7 @@ class Sudoku:
             menu = small_font.render("BACK TO MENU", True, black, light_purple)
             menuRect = menu.get_rect()
             menuRect.center = (width // 2, (10 * scale) + (scale // 2))
-            pygame.draw.rect(screen, light_purple, [0, 10 * scale, width, height])
+            pygame.draw.rect(screen, light_purple, [0, 10 * scale, width, scale])
             screen.blit(menu, menuRect)
 
             # Win condition
@@ -448,5 +448,3 @@ class Sudoku:
             clock.tick(60)
 
             pygame.display.update()
-
-        #pygame.quit()

@@ -415,7 +415,7 @@ class WordSearch:
             menu = small_font.render("BACK TO MENU", True, black, light_purple)
             menuRect = menu.get_rect()
             menuRect.center = (width // 2, (23 * scale) + (scale // 2))
-            pygame.draw.rect(screen, light_purple, [0, 23 * scale, width, height])
+            pygame.draw.rect(screen, light_purple, [0, 23 * scale, width, scale])
             screen.blit(menu, menuRect)
 
             # Win condition
