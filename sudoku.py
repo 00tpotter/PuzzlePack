@@ -264,6 +264,7 @@ class Sudoku:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    pygame.quit()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     # User clicks the mouse. Get the position
@@ -428,7 +429,7 @@ class Sudoku:
             screen.blit(menu, menuRect)
 
             # Win condition
-            if correct > 81:
+            if np.all(temp == self.answer):
                 win = True
                 text = "{0:02}:{1:02}".format(int(score[0]), int(score[1]))
                 
