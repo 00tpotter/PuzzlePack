@@ -3,7 +3,9 @@ import pygame
 import time
 import sys
 import random
+import numpy as np
 from typing import List
+pygame.font.init()
 
 WIDTH = 800
 squareSize = WIDTH / 8
@@ -16,7 +18,7 @@ BLUE = (50, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
-
+font = pygame.font.SysFont('timesnewroman.ttc', 48)
 
 ##piece class, passed in a single number from 0 to 13, representing the different pieces.
 # None = 0
@@ -465,10 +467,18 @@ def unhighlight_squares(B, moves):
     for i in moves:
         B.board[i].unhighlight()
 
-def update_display(win, Board):
+def update_display(win, Board, score, winIn):
     for square in Board.board:
         square.draw(win)
-        pygame.display.update()
+    text1 = font.render("Score: " + str(score), True, RED)
+    text2 = font.render("Find mate in " + str(winIn), True, RED)
+    rect1 = text1.get_rect()
+    rect1.center = (200, 25)
+    rect2 = text2.get_rect()
+    rect2.center = (600, 25)
+    win.blit(text1, rect1)
+    win.blit(text2, rect2)
+    pygame.display.update()
 
 def findNode(pos):
     x,y = pos
@@ -480,9 +490,17 @@ def main(WIN, WIDTH):
     B = Board()
     counter = -1
     puzzles = loadPuzzles()
-    temp = list(range(0, len(puzzles)))
-    random.shuffle(temp)
+    temp1 = list(range(0, 19))
+    temp2 = list(range(20,39))
+    temp3 = list(range(40,59))
+    random.shuffle(temp1)
+    random.shuffle(temp2)
+    random.shuffle(temp3)
+    temp = temp1[0:10] + temp2[0:10] + temp3[0:10]
     for puzzleNum in temp:
+        winIn = 3
+        if counter < 9:
+            winIn = 2
         counter += 1
         for sq in B.board:
             sq.movePiece()
@@ -502,7 +520,7 @@ def main(WIN, WIDTH):
                 B.board[0].occupiedBy.moved = True
         if ep != -1:
             B.board[ep].occupiedBy.enPassant = True
-        B.printBoard()
+        # B.printBoard()
         pygame.init()
         moveNum = t
         correct = True
@@ -534,13 +552,13 @@ def main(WIN, WIDTH):
                         pygame.time.delay(500)
                         moves = selectPiece(B, m1)
                         highlight_squares(B, moves)
-                        update_display(WIN, B)
+                        update_display(WIN, B, counter, winIn)
                         pygame.time.delay(500)
                         piece = B.board[m1].occupiedBy
                         B.board[m2].placePiece(piece)
                         B.board[m1].movePiece()
                         unhighlight_squares(B, moves)
-                        update_display(WIN, B)
+                        update_display(WIN, B, counter, winIn)
                         moveNotMade = False
                         moveNum += 1
                         break
@@ -627,15 +645,28 @@ def main(WIN, WIDTH):
                                 choseMove = False
 
 
-                update_display(WIN, B)
+                update_display(WIN, B, counter, winIn)
                 if correct == False:
+                    break
+            if correct == False:
                     break
         if correct:
             print("correct")
         else:
             break
-    print("this signals you either beat the game or lost")
-    print("final score: " + str(counter))
+    font = pygame.font.SysFont('timesnewroman.ttc', 100)
+    text = font.render("Game Over!", True, RED)
+    rect = text.get_rect()
+    rect.center = (WIDTH / 2, WIDTH / 2)
+    WIN.blit(text, rect)
+    font = pygame.font.SysFont('timesnewroman.ttc', 48)
+    text2 = font.render("Final Score: " + str(counter), True, RED)
+    rect2 = text2.get_rect()
+    rect2.center = (WIDTH / 2, WIDTH / 2 + 100)
+    WIN.blit(text2, rect2)
+    pygame.display.update()
+    pygame.time.delay(3000)
+
 
 
 
