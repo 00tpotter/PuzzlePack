@@ -37,7 +37,11 @@ class Square:
 
     def setValue(self, n):
         self.value = n
-        self.img = font.render(str(self.value), True, BLACK)
+        if n == 0:
+            self.img = font.render(" ", True, BLACK)
+        else:
+            self.img = font.render(str(self.value), True, BLACK)
+        
     def getValue(self):
         return self.value
     def reveal(self):
