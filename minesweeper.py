@@ -6,7 +6,6 @@ import random
 import numpy as np
 pygame.font.init()
 
-# Minesweeper class4
 WIDTH = 800
 
 WHITE = (255, 255, 255)
